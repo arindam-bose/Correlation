@@ -2,7 +2,7 @@
 CORRELATION calculates periodic and aperiodic cross-correlation function estimates.
 
 Inputs:
-       X        : a set of M sequence of length N vectors (N>1).
+       X        : a set of M sequence of length N vectors (N>1).\\
        CORRTYPE : 'a' - aperiodic cross-correlation (default)
                   'p' - periodic cross-correlation
 
