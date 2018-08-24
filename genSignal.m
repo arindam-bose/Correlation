@@ -6,6 +6,7 @@ function [X] = genSignal(ch_X, varargin)
 %                    2: binary sequence [1,-1]
 %                    3: all ones 
 %                    4: finite alphabate: rth roots of unity
+%                    5: single r-th root ZadoffChu sequence
 %              default: random real sequence [0,1]
 %       M : number of sequences in the family
 %       N : length of each sequence
@@ -35,6 +36,11 @@ elseif ch_X == 4         % finite alphabate: rth roots of unity
     p = [1, zeros(1,r-1), -1];
     z = roots(p);
     X = z(randi(length(z), N, M));
+elseif ch_X == 5         % single r-th root ZadoffChu sequence
+    if M > 1
+        error('M cannot be greater than 1');
+    end
+    X = lteZadoffChuSeq(r,N);
 else                     % random real sequence [0,1]
     X = rand(N, M);
 end

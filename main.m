@@ -5,19 +5,20 @@ close all;
 
 %% Single sequence generation
 % X: a set of M sequences of length N
-M         = 5;
-N         = 1000;
-r         = 5;           % r-th root of unity
+M         = 1;
+N         = 139;
+r         = 25;           % r-th root of unity
 
 idx1      = 1;           % which pair you want to see the correlations
 idx2      = 1;
 
 normed    = 1;           % 0: un-normalized axis, 
                          % 1: normalized axis
-ch_X      = 4;           % 1: random requence
-                         % 2: binary sequence
+ch_X      = 5;           % 1: random complex sequence a + ib (a,b are in [-1,1])
+                         % 2: binary sequence [1,-1]
                          % 3: all ones 
-                         % 4: finite alphabate: roots of unity
+                         % 4: finite alphabate: rth roots of unity
+                         % 5: single r-th root ZadoffChu sequence
 
 if (idx1 > M || idx2 > M)
     error('sequence indices cannot be larger than M');
@@ -39,7 +40,7 @@ elseif normed == 0
     temp_str = 'Un-normalized amplitude'; 
 end
 
-figure; 
+figure(1); 
 subplot(2,2,1); 
                 plot(k, abs(squeeze(R(idx1,idx2,:))) / temp_d);
                 title(sprintf('Aperiodic cross-correlation X(:,%d) and X(:,%d)', idx1, idx2));
@@ -66,6 +67,7 @@ ch_X      = 1;           % 1: random requence
                          % 2: binary sequence
                          % 3: all ones 
                          % 4: finite alphabate: roots of unity
+                         % 5: single r-th root ZadoffChu sequence
 
 Apsl      = zeros(1, N_max); 
 Aisl      = zeros(1, N_max);
@@ -90,7 +92,7 @@ for n = 2:N_max
 end
 
 % plots
-figure; 
+figure(2); 
 subplot(2,2,1); 
                 plot(Apsl);  hold on;
                 plot(welchApsl);  
@@ -113,3 +115,22 @@ subplot(2,2,4);
                 xlabel('Sequence length'); grid on;  hold off;
 
                 
+%% frequency and phase distribution of a signle sequence
+N    = 1001;
+r    = 25;               % r-th root of unity
+
+ch_x = 5;                % 1: random complex sequence a + ib (a,b are in [-1,1])
+                         % 2: binary sequence [1,-1]
+                         % 3: all ones 
+                         % 4: finite alphabate: rth roots of unity
+                         % 5: single r-th root ZadoffChu sequence
+                         
+x    = genSignal(ch_x, 1, N, r);
+X    = fftshift(fft(x,N));
+
+% plots
+figure(3);
+subplot(2,1,1); plot(20*log10(abs(X))); title('Magnitude of the frequency spectrum');
+                xlabel('Frequency (N)'); ylabel('magnitude (dB)'); grid on;
+subplot(2,1,2); plot(angle(X)/pi); title('Phase of the frequency spectrum');
+                xlabel('Frequency (N)'); ylabel('phase / \pi'); grid on;            
