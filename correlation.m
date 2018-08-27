@@ -1,4 +1,4 @@
-function [C] = correlation(X, varargin)
+function [C, lags] = correlation(X, varargin)
 % CORRELATION calculates periodic and aperiodic cross-correlation function estimates.
 %
 % Inputs:
@@ -9,10 +9,13 @@ function [C] = correlation(X, varargin)
 % Outputs:
 %       C        : M x M x 2*N-1 matrix of cross-correlation values
 %                  M x M is the size of cross-correaltion matrix for each lag -N+1 <= l <= N-1
+%       k        : corresponding lags
 %
 % Usage:
 %       R        = correlation(X, 'a');
 %       C        = correlation(X, 'p');
+%       [R,k]    = correlation(X, 'a');
+%       [C,k]    = correlation(X, 'p');
 %
 % Arindam Bose
 % Fall 2017
@@ -43,6 +46,7 @@ else                          % corrType = 'p' || corrType = 'P'
         end
     end
 end
+lags = (-N+1) : (N-1);
 
 
 %--------------------------------------------------------------------------
@@ -58,7 +62,7 @@ function [corrType] = parseinput(varargin)
 corrType = 'a';
 
 switch nargin
-   case 2                                 
+   case 1                                 
       if ischar(varargin{1})
          corrType = varargin{1};           
       else                                 % Not recognized

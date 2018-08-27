@@ -1,37 +1,43 @@
 %%
-clc;
-clear all;
-close all;
+% clc;
+% clear all;
+% close all;
 
-%% Single sequence generation
+%% Sequence and other parameters
 % X: a set of M sequences of length N
-M         = 1;
-N         = 139;
-r         = 25;           % r-th root of unity
+M         = 5;
+N         = 100;
 
+% other parameters
+r         = 25;          % R-th root of unity
 idx1      = 1;           % which pair you want to see the correlations
 idx2      = 1;
-
 normed    = 1;           % 0: un-normalized axis, 
                          % 1: normalized axis
-ch_X      = 5;           % 1: random complex sequence a + ib (a,b are in [-1,1])
+ch_X      = 1;           % 1: random complex sequence a + ib (a,b are in [-1,1])
                          % 2: binary sequence [1,-1]
                          % 3: all ones 
                          % 4: finite alphabate: rth roots of unity
                          % 5: single r-th root ZadoffChu sequence
+                         % 6: chirp signal
+                         
+%% Single sequence properties                         
+params    = [];
+params.M  = M;
+params.N  = N;
+params.R  = r;
 
 if (idx1 > M || idx2 > M)
     error('sequence indices cannot be larger than M');
 end
 
-X = genSignal(ch_X, M, N, r);
+X = genSignal(ch_X, params);
 
 % cross-correlations
-R    = correlation(X, 'a');
-C    = correlation(X, 'p');
+[R, kr]  = correlation(X, 'a');
+[C, kc]  = correlation(X, 'p');
 
 % plots
-k = (-N+1) : (N-1);
 if normed == 1
     temp_d   = (norm(X(:,idx1))*norm(X(:,idx2)));
     temp_str = 'Normalized amplitude'; 
@@ -42,33 +48,27 @@ end
 
 figure(1); 
 subplot(2,2,1); 
-                plot(k, abs(squeeze(R(idx1,idx2,:))) / temp_d);
+                plot(kr, abs(squeeze(R(idx1,idx2,:))) / temp_d);
                 title(sprintf('Aperiodic cross-correlation X(:,%d) and X(:,%d)', idx1, idx2));
                 xlabel('k'); ylabel(temp_str); grid on;
 subplot(2,2,2); 
-                plot(k, abs(squeeze(R(idx2,idx1,:)))/ temp_d);
+                plot(kr, abs(squeeze(R(idx2,idx1,:)))/ temp_d);
                 title(sprintf('Aperiodic cross-correlation X(:,%d) and X(:,%d)', idx2, idx1));
                 xlabel('k'); ylabel(temp_str); grid on;
 subplot(2,2,3); 
-                plot(k, abs(squeeze(C(idx1,idx2,:))) / temp_d);
+                plot(kc, abs(squeeze(C(idx1,idx2,:))) / temp_d);
                 title(sprintf('Periodic cross-correlation X(:,%d) and X(:,%d)', idx1, idx2)); 
                 xlabel('k'); ylabel(temp_str); grid on;
 subplot(2,2,4); 
-                plot(k, abs(squeeze(C(idx2,idx1,:))) / temp_d);
+                plot(kc, abs(squeeze(C(idx2,idx1,:))) / temp_d);
                 title(sprintf('Periodic cross-correlation X(:,%d) and X(:,%d)', idx2, idx1));
                 xlabel('k'); ylabel(temp_str); grid on;
 
 %% psl and isl against sequence length
-% X: a set of M sequences of maximum lengths N_max
-M         = 5;
-N_max     = 1000;
-r         = 5;           % r-th root of unity
-ch_X      = 1;           % 1: random requence
-                         % 2: binary sequence
-                         % 3: all ones 
-                         % 4: finite alphabate: roots of unity
-                         % 5: single r-th root ZadoffChu sequence
-
+params    = [];
+params.M  = M;
+params.R  = r;
+    
 Apsl      = zeros(1, N_max); 
 Aisl      = zeros(1, N_max);
 Ppsl      = zeros(1, N_max);
@@ -77,8 +77,10 @@ welchisl  = zeros(1, N_max);
 welchApsl = zeros(1, N_max);
 welchPpsl = zeros(1, N_max);
 
+warning('Welch bound is not valid for M = 1 ');
 for n = 2:N_max
-    X            = genSignal(ch_X, M, n, r);
+    params.N     = n;
+    X            = genSignal(ch_X, params);
     R            = correlation(X, 'a');
     C            = correlation(X, 'p');
     Apsl(n)      = psl(R); 
@@ -116,17 +118,13 @@ subplot(2,2,4);
 
                 
 %% frequency and phase distribution of a signle sequence
-N    = 1001;
-r    = 25;               % r-th root of unity
+params    = [];
+params.M  = 1;
+params.N  = N;
+params.R  = r;
 
-ch_x = 5;                % 1: random complex sequence a + ib (a,b are in [-1,1])
-                         % 2: binary sequence [1,-1]
-                         % 3: all ones 
-                         % 4: finite alphabate: rth roots of unity
-                         % 5: single r-th root ZadoffChu sequence
-                         
-x    = genSignal(ch_x, 1, N, r);
-X    = fftshift(fft(x,N));
+x         = genSignal(ch_x, params);
+X         = fftshift(fft(x,N));
 
 % plots
 figure(3);
