@@ -5,8 +5,9 @@
 
 %% Sequence and other parameters
 % X: a set of M sequences of length N
-M         = 5;
-N         = 100;
+M         = 1;
+N         = 7;
+N_max     = 20;
 
 % other parameters
 r         = 25;          % R-th root of unity
@@ -31,7 +32,8 @@ if (idx1 > M || idx2 > M)
     error('sequence indices cannot be larger than M');
 end
 
-X = genSignal(ch_X, params);
+% X = genSignal(ch_X, params);
+X = [1; 1; 1;  -1; -1; 1; -1]; % Barker sequence of length 7
 
 % cross-correlations
 [R, kr]  = correlation(X, 'a');
@@ -123,7 +125,7 @@ params.M  = 1;
 params.N  = N;
 params.R  = r;
 
-x         = genSignal(ch_x, params);
+x         = genSignal(ch_X, params);
 X         = fftshift(fft(x,N));
 
 % plots
